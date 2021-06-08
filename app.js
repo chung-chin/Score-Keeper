@@ -1,56 +1,94 @@
 const resetButton = document.querySelector('#reset');
+const rematchButton = document.querySelector('#rematch');
 const playTo = document.querySelector('#playto');
 
 let maxScore = parseInt(playTo.value);
 let endGame = false;
+let zeroScore = true;
 
 const p1 = {
     score: 0,
-    button: document.querySelector('#p1Button'),
+    buttonIncrease: document.querySelector('#p1Increase'),
+    buttonDecrease: document.querySelector('#p1Decrease'),
     display: document.querySelector('#p1Display')
 }
 
 const p2 = {
     score: 0,
-    button: document.querySelector('#p2Button'),
+    buttonIncrease: document.querySelector('#p2Increase'),
+    buttonDecrease: document.querySelector('#p2Decrease'),
     display: document.querySelector('#p2Display')
 }
 
-p1Button.addEventListener('click', function () {
-    scoreUp(p1, p2);
+p1.buttonIncrease.addEventListener('click', function () {
+    scoreIncrease(p1, p2);
 })
 
-p2Button.addEventListener('click', function () {
-    scoreUp(p2, p1);
+p2.buttonIncrease.addEventListener('click', function () {
+    scoreIncrease(p2, p1);
 })
 
-function scoreUp(player, another) {
+p1.buttonDecrease.addEventListener('click', function () {
+    scoreDecrease(p1, p2);
+})
+
+p2.buttonDecrease.addEventListener('click', function () {
+    scoreDecrease(p2, p1);
+})
+
+function scoreIncrease(player, another) {
     if (!endGame) {
         player.score += 1;
+        player.buttonDecrease.disabled = false;
         player.display.textContent = player.score;
         if (player.score === maxScore) {
             player.display.style.color = "green";
             another.display.style.color = "red";
             endGame = true;
-            player.button.disabled = true;
-            another.button.disabled = true;
+            player.buttonIncrease.disabled = true;
+            another.buttonIncrease.disabled = true;
         }
     }
 }
 
-playTo.addEventListener('change', function (){
+function scoreDecrease(player, another) {
+    if (endGame) {
+        if (player.score === maxScore) {
+            player.score -= 1;
+            player.display.textContent = player.score;
+            player.display.style.color = "";
+            another.display.style.color = "";
+            player.buttonIncrease.disabled = false;
+            another.buttonIncrease.disabled = false;
+            endGame = false;
+        } else {
+            player.score -= 1;
+            player.display.textContent = player.score;
+        }
+    } else {
+        player.score -= 1;
+        player.display.textContent = player.score;
+    }
+
+    if (player.score === 0) {
+        player.buttonDecrease.disabled = true;
+    }
+}
+
+playTo.addEventListener('change', function () {
     maxScore = parseInt(this.value);
-    reset();
+    rematch();
 })
 
-resetButton.addEventListener('click', reset)
+rematchButton.addEventListener('click', rematch)
 
-function reset() {
+function rematch() {
     endGame = false;
     for (let p of [p1, p2]) {
         p.score = 0;
         p.display.textContent = p.score;
         p.display.style.color = "";
-        p.button.disabled = false;
+        p.buttonIncrease.disabled = false;
+        p.buttonDecrease.disabled = true;
     }
 }
